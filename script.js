@@ -56,6 +56,7 @@
     history: 'polyra-history',
     formality: 'polyra-formality',
     speakReplies: 'polyra-speak-replies',
+    introHidden: 'polyra-intro-hidden',
   };
 
   // ---------- DOM ----------
@@ -980,6 +981,31 @@
 
   tabTranslate.addEventListener('click', () => setMode('translate'));
   tabConvo.addEventListener('click', () => setMode('convo'));
+
+  // ============================================================
+  // INTRO CARD
+  // ============================================================
+
+  const introEl = $('intro');
+
+  function setIntroHidden(hidden) {
+    introEl.hidden = hidden;
+    storageSet(STORAGE.introHidden, hidden);
+  }
+
+  introEl.hidden = storageGet(STORAGE.introHidden, false) === true;
+
+  $('introClose').addEventListener('click', () => setIntroHidden(true));
+
+  $('introShow').addEventListener('click', () => {
+    setIntroHidden(false);
+    introEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  $('introTryConvo').addEventListener('click', () => {
+    setMode('convo');
+    tabConvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 
   // ---------- Init ----------
 
