@@ -1,6 +1,6 @@
 # Polyra — Language Translator
 
-**🔗 Live: [gorgeous-ganache-6bfb6f.netlify.app](https://gorgeous-ganache-6bfb6f.netlify.app)**
+**🔗 Live: [polyra.netlify.app](https://polyra.netlify.app)**
 
 A clean, single-page translator supporting 25 languages, backed by the DeepL API for
 high-quality machine translation.
@@ -51,8 +51,8 @@ DeepL API  ──(unsupported language)──▶  MyMemory API
 ## Run it yourself
 
 ```bash
-git clone https://github.com/NBenedicta/lat-translator.git
-cd lat-translator
+git clone https://github.com/NBenedicta/polyra.git
+cd polyra
 npx netlify-cli dev   # serves the site + the function locally
 ```
 
