@@ -1,4 +1,4 @@
-# LAT — Language Translator
+# Polyra — Language Translator
 
 **🔗 Live: [gorgeous-ganache-6bfb6f.netlify.app](https://gorgeous-ganache-6bfb6f.netlify.app)**
 
@@ -10,9 +10,17 @@ high-quality machine translation.
 - Translate between 25 languages, including English, Spanish, French, German,
   Mandarin, Japanese, Arabic, Hindi, Swahili, Zulu, and more
 - Auto-detect the source language
-- One-click swap between source and target
-- Copy translated text to clipboard
-- Dark, responsive UI — works on mobile, tablet, and desktop
+- **Conversation mode** — two people take turns speaking (or typing); each turn is
+  translated and read aloud for the other person, shown as a chat transcript
+- **Voice input** — dictate instead of typing (Chrome, Edge, Safari)
+- **Read aloud** — hear the source or the translation spoken by your device's voices
+- **Formal / informal tone** — for German, French, Italian, Spanish, Dutch, Polish,
+  Portuguese, Japanese and Russian
+- **History & saved translations** — recent translations and starred favourites,
+  kept in your browser
+- **Light and dark themes**, following your system setting by default
+- One-click swap between source and target, copy to clipboard, Ctrl+Enter to translate
+- Responsive UI — works on mobile, tablet, and desktop
 - Graceful error handling if the translation service is unavailable
 
 ## Tech stack

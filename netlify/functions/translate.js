@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON body' }) };
   }
 
-  const { text, source, target } = payload;
+  const { text, source, target, formality } = payload;
 
   if (!text || !target) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing text or target language' }) };
@@ -38,7 +38,7 @@ exports.handler = async (event) => {
   try {
     const result = needsFallback
       ? await translateWithMyMemory(text, source, target)
-      : await translateWithDeepL(text, source, target);
+      : await translateWithDeepL(text, source, target, formality);
     return { statusCode: 200, headers, body: JSON.stringify(result) };
   } catch (err) {
     return { statusCode: 502, headers, body: JSON.stringify({ error: err.message || 'Translation failed' }) };

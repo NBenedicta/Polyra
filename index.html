@@ -1,10 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>LAT — Language Translator</title>
-<meta name="description" content="LAT is a fast, free, minimal language translator supporting 25 languages." />
+<title>Polyra — Language Translator</title>
+<meta name="description" content="Polyra is a fast, free, minimal language translator supporting 25 languages, with voice input, read-aloud and live conversation mode." />
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M12 6h16a8 8 0 0 1 8 8v6a8 8 0 0 1-8 8h-8l-6 5v-5h-2a8 8 0 0 1-8-8v-6a8 8 0 0 1 8-8z' fill='none' stroke='%2393b4f5' stroke-width='3'/%3E%3Cpath d='M22 17h14a8 8 0 0 1 8 8v6a8 8 0 0 1-8 8h-2v5l-6-5h-6a8 8 0 0 1-8-8v-6a8 8 0 0 1 8-8z' fill='%232563eb'/%3E%3Cpath d='M21 26h16M21 32h10' stroke='%23fff' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+<script>
+  // Apply the saved (or system) theme before first paint to avoid a flash.
+  (function () {
+    var t;
+    try { t = JSON.parse(localStorage.getItem('polyra-theme')); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,96 +30,261 @@
 
 <div class="bg-glow" aria-hidden="true"></div>
 
+<button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light theme" title="Toggle theme">
+  <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4"></circle>
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+  </svg>
+  <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+</button>
+
 <header class="site-header">
-  <h1 class="logo">LAT</h1>
-  <p class="subtitle">Language Translator</p>
+  <div class="brand">
+    <svg class="logo-mark" viewBox="0 0 48 48" aria-hidden="true">
+      <defs>
+        <linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#60a5fa" />
+          <stop offset="1" stop-color="#2563eb" />
+        </linearGradient>
+      </defs>
+      <path class="logo-mark-back" d="M12 6h16a8 8 0 0 1 8 8v6a8 8 0 0 1-8 8h-8l-6 5v-5h-2a8 8 0 0 1-8-8v-6a8 8 0 0 1 8-8z" />
+      <path d="M22 17h14a8 8 0 0 1 8 8v6a8 8 0 0 1-8 8h-2v5l-6-5h-6a8 8 0 0 1-8-8v-6a8 8 0 0 1 8-8z" fill="url(#logoGrad)" />
+      <path d="M21 26h16M21 32h10" stroke="#fff" stroke-width="2.6" stroke-linecap="round" />
+    </svg>
+    <h1 class="logo">Polyra</h1>
+  </div>
+  <p class="subtitle">Translate, speak and converse in 25 languages</p>
 </header>
 
+<nav class="mode-tabs" role="tablist" aria-label="Mode">
+  <button id="tabTranslate" class="mode-tab" type="button" role="tab" aria-selected="true" aria-controls="translateView">Translate</button>
+  <button id="tabConvo" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="convoView">Conversation</button>
+</nav>
+
 <main>
-  <section class="translator-card" aria-label="Translator">
 
-    <div class="panels-row">
+  <!-- ================= TRANSLATE MODE ================= -->
+  <div id="translateView" class="view" role="tabpanel" aria-labelledby="tabTranslate">
 
-      <!-- SOURCE PANEL -->
-      <div class="panel source-panel">
-        <div class="panel-top">
-          <label class="visually-hidden" for="sourceLang">Source language</label>
-          <select id="sourceLang" class="lang-select"></select>
-        </div>
+    <section class="translator-card" aria-label="Translator">
 
-        <textarea
-          id="sourceText"
-          class="text-area"
-          placeholder="Type or paste text to translate…"
-          maxlength="2000"
-          spellcheck="true"
-        ></textarea>
+      <div class="panels-row">
 
-        <div class="panel-bottom">
-          <span id="charCount" class="char-count">0 / 2000</span>
-          <button id="clearBtn" class="text-btn" type="button" title="Clear text">Clear</button>
-        </div>
-      </div>
+        <!-- SOURCE PANEL -->
+        <div class="panel source-panel">
+          <div class="panel-top">
+            <label class="visually-hidden" for="sourceLang">Source language</label>
+            <select id="sourceLang" class="lang-select"></select>
+          </div>
 
-      <!-- SWAP BUTTON -->
-      <button id="swapBtn" class="swap-btn" type="button" title="Swap languages" aria-label="Swap languages">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="17 1 21 5 17 9"></polyline>
-          <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-          <polyline points="7 23 3 19 7 15"></polyline>
-          <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-        </svg>
-      </button>
-
-      <!-- TARGET PANEL -->
-      <div class="panel target-panel">
-        <div class="panel-top">
-          <label class="visually-hidden" for="targetLang">Target language</label>
-          <select id="targetLang" class="lang-select"></select>
-        </div>
-
-        <div class="output-wrap">
           <textarea
-            id="outputText"
-            class="text-area output-area"
-            placeholder="Translation will appear here…"
-            readonly
-            tabindex="-1"
+            id="sourceText"
+            class="text-area"
+            placeholder="Type, paste or speak text to translate…"
+            maxlength="2000"
+            spellcheck="true"
           ></textarea>
 
-          <div id="spinner" class="spinner" hidden>
-            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <div class="panel-bottom">
+            <div class="tool-group">
+              <button id="micBtn" class="icon-btn mic-btn" type="button" title="Speak to type" aria-label="Speak to type">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+                  <path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"></path>
+                </svg>
+              </button>
+              <button id="speakSourceBtn" class="icon-btn speak-btn" type="button" title="Listen" aria-label="Listen to source text">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                </svg>
+              </button>
+              <span id="charCount" class="char-count">0 / 2000</span>
+            </div>
+            <button id="clearBtn" class="text-btn" type="button" title="Clear text">Clear</button>
           </div>
         </div>
 
-        <div class="panel-bottom">
-          <span class="char-count-spacer"></span>
-          <div class="copy-wrap">
-            <button id="copyBtn" class="text-btn" type="button" title="Copy translation">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-              Copy
-            </button>
-            <span id="copiedTip" class="copied-tip" hidden>Copied!</span>
+        <!-- SWAP BUTTON -->
+        <button id="swapBtn" class="swap-btn" type="button" title="Swap languages" aria-label="Swap languages">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9"></polyline>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+            <polyline points="7 23 3 19 7 15"></polyline>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+          </svg>
+        </button>
+
+        <!-- TARGET PANEL -->
+        <div class="panel target-panel">
+          <div class="panel-top">
+            <label class="visually-hidden" for="targetLang">Target language</label>
+            <select id="targetLang" class="lang-select"></select>
           </div>
+
+          <div class="output-wrap">
+            <textarea
+              id="outputText"
+              class="text-area output-area"
+              placeholder="Translation will appear here…"
+              readonly
+              tabindex="-1"
+            ></textarea>
+
+            <div id="spinner" class="spinner" hidden>
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+          </div>
+
+          <div class="panel-bottom">
+            <div class="tool-group">
+              <button id="speakTargetBtn" class="icon-btn speak-btn" type="button" title="Listen" aria-label="Listen to translation">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                </svg>
+              </button>
+              <button id="saveBtn" class="icon-btn star-btn" type="button" title="Save translation" aria-label="Save translation" aria-pressed="false" disabled>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </button>
+            </div>
+            <div class="copy-wrap">
+              <button id="copyBtn" class="text-btn" type="button" title="Copy translation">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy
+              </button>
+              <span id="copiedTip" class="copied-tip" hidden>Copied!</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="errorBox" class="error-box" hidden role="alert"></div>
+
+      <div class="actions">
+        <div class="formality" role="group" aria-labelledby="formalityLabel">
+          <span id="formalityLabel" class="formality-label">Tone</span>
+          <div class="segmented" id="formalityGroup">
+            <button type="button" class="seg-btn" data-formality="default" aria-pressed="true">Default</button>
+            <button type="button" class="seg-btn" data-formality="more" aria-pressed="false">Formal</button>
+            <button type="button" class="seg-btn" data-formality="less" aria-pressed="false">Informal</button>
+          </div>
+          <span id="formalityNote" class="formality-note" hidden></span>
+        </div>
+        <button id="translateBtn" class="translate-btn" type="button">Translate</button>
+      </div>
+
+    </section>
+
+    <!-- HISTORY -->
+    <section class="history-card" aria-label="History">
+      <div class="history-head">
+        <div class="history-tabs" role="tablist" aria-label="History lists">
+          <button id="histTabRecent" class="hist-tab" type="button" role="tab" aria-selected="true">Recent</button>
+          <button id="histTabSaved" class="hist-tab" type="button" role="tab" aria-selected="false">Saved <span id="savedCount" class="count-pill">0</span></button>
+        </div>
+        <button id="clearHistoryBtn" class="text-btn" type="button">Clear recent</button>
+      </div>
+      <ul id="historyList" class="history-list"></ul>
+      <p id="historyEmpty" class="history-empty">Your translations will show up here.</p>
+    </section>
+
+  </div>
+
+  <!-- ================= CONVERSATION MODE ================= -->
+  <div id="convoView" class="view" role="tabpanel" aria-labelledby="tabConvo" hidden>
+    <section class="translator-card convo-card" aria-label="Conversation">
+
+      <div class="convo-langs">
+        <div class="convo-person">
+          <span class="person-tag person-a">Person A</span>
+          <label class="visually-hidden" for="convoLangA">Person A language</label>
+          <select id="convoLangA" class="lang-select"></select>
+        </div>
+        <button id="convoSwapBtn" class="swap-btn" type="button" title="Swap languages" aria-label="Swap conversation languages">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9"></polyline>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+            <polyline points="7 23 3 19 7 15"></polyline>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+          </svg>
+        </button>
+        <div class="convo-person">
+          <span class="person-tag person-b">Person B</span>
+          <label class="visually-hidden" for="convoLangB">Person B language</label>
+          <select id="convoLangB" class="lang-select"></select>
         </div>
       </div>
 
-    </div>
+      <div id="transcript" class="transcript" aria-live="polite">
+        <div id="transcriptEmpty" class="transcript-empty">
+          <p><strong>Talk across languages.</strong></p>
+          <p>Pick a language for each person, then take turns tapping your mic (or typing). Polyra translates each turn and reads it aloud for the other person.</p>
+        </div>
+      </div>
 
-    <div id="errorBox" class="error-box" hidden role="alert"></div>
+      <div id="convoStatus" class="convo-status" hidden></div>
+      <div id="convoNoMic" class="convo-note" hidden>Voice input isn't supported in this browser. Try Chrome, Edge or Safari, or type below.</div>
 
-    <div class="actions">
-      <button id="translateBtn" class="translate-btn" type="button">Translate</button>
-    </div>
+      <div class="convo-controls">
+        <div class="convo-side" data-side="a">
+          <button class="convo-mic person-a-bg" type="button" data-side="a" aria-label="Person A: speak">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+              <path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"></path>
+            </svg>
+          </button>
+          <form class="convo-form" data-side="a">
+            <label class="visually-hidden" for="convoInputA">Person A message</label>
+            <input id="convoInputA" class="convo-input" type="text" maxlength="500" placeholder="Person A, type here…" autocomplete="off" />
+            <button class="convo-send" type="submit" aria-label="Send Person A message">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+            </button>
+          </form>
+        </div>
+        <div class="convo-side" data-side="b">
+          <button class="convo-mic person-b-bg" type="button" data-side="b" aria-label="Person B: speak">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+              <path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"></path>
+            </svg>
+          </button>
+          <form class="convo-form" data-side="b">
+            <label class="visually-hidden" for="convoInputB">Person B message</label>
+            <input id="convoInputB" class="convo-input" type="text" maxlength="500" placeholder="Person B, type here…" autocomplete="off" />
+            <button class="convo-send" type="submit" aria-label="Send Person B message">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+            </button>
+          </form>
+        </div>
+      </div>
 
-  </section>
+      <div class="convo-footer">
+        <label class="switch">
+          <input id="speakRepliesToggle" type="checkbox" checked />
+          <span class="switch-track" aria-hidden="true"></span>
+          Read translations aloud
+        </label>
+        <button id="clearConvoBtn" class="text-btn" type="button">Clear conversation</button>
+      </div>
+
+    </section>
+  </div>
+
 </main>
 
+<div id="toast" class="toast" role="status" hidden></div>
+
 <footer class="site-footer">
-  <p>Built with LAT · Powered by the free MyMemory Translation API</p>
+  <p>Polyra · Powered by DeepL</p>
 </footer>
 
 <script src="script.js"></script>

@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
     }
   }
 
-  const { text, source, target } = payload || {};
+  const { text, source, target, formality } = payload || {};
 
   if (!text || !target) {
     res.status(400).json({ error: 'Missing text or target language' });
@@ -41,7 +41,7 @@ module.exports = async (req, res) => {
   try {
     const result = needsFallback
       ? await translateWithMyMemory(text, source, target)
-      : await translateWithDeepL(text, source, target);
+      : await translateWithDeepL(text, source, target, formality);
     res.status(200).json(result);
   } catch (err) {
     res.status(502).json({ error: err.message || 'Translation failed' });

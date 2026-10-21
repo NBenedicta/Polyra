@@ -1,4 +1,4 @@
-# Deploying LAT
+# Deploying Polyra
 
 This project needs one serverless function (`/api/translate`) to keep the DeepL API
 key off the client, so deployment is a Git-connected build rather than a plain
